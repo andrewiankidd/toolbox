@@ -53,6 +53,10 @@ Output as markdown:
 
 Omit empty sections. Keep descriptions concise — rewrite commit messages for clarity if needed, don't just copy them verbatim.
 
+## Step 5 — Write to file
+
+Write the output to `CHANGELOG.md` in the repository root.
+
 ## Rules
 
 - Never fabricate commits or changes
