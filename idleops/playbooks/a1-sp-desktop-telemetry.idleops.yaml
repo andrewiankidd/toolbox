@@ -1,0 +1,111 @@
+# Track A1 — singleplayer desktop session smoke test
+# See .context/todo/telemetry-e2e-testing.md
+#
+# Goal: launch the shipped Windows build, reach an in-game world, let the
+# heartbeat loop fire at least once, screenshot the result, and close
+# cleanly so telemetry flushes.
+#
+# Verification (after this playbook exits) is done outside via
+# the debug-telemetry skill + curl https://tiltedcartridge.co.uk/stats.
+#
+# Quirks learned while authoring:
+#   - Window title is exactly "TinnedSpaghetti" (Godot project name).
+#   - OCR via Windows.Media.Ocr misses the word "Start" on the main menu
+#     (font/contrast), but finds "Continue". Computed coords for Start
+#     are derived from the "Continue" position: ~43px above it.
+#   - PostMessage ALT+F4 does not close a Godot window. Close via the
+#     in-game pause menu → Quit, which calls get_tree().quit() → fires
+#     NOTIFICATION_PREDELETE → Telemetry._notification flushes.
+
+steps:
+  # Launch the already-downloaded latest-release binary. Refresh before
+  # running with:
+  #   bash .toolbox/.claude/skills/run-latest-release/run-latest-release.sh
+  - id: game
+    name: Launch game
+    action: exec
+    args: C:\Users\Andrew\AppData\Local\Temp\run-latest-release\andrewiankidd_TinnedSpaghetti\extracted\StandaloneWindows64\project.exe
+    wait: false
+
+  # Wait on "Continue" instead of "Start" because OCR fails on the Start
+  # label but handles Continue cleanly.
+  - name: Wait for main menu to render
+    action: wait-window
+    window: "TinnedSpaghetti*"
+    text: "Continue"
+    timeout: 45
+
+  - name: Screenshot main menu (baseline)
+    action: screenshot
+    window: "TinnedSpaghetti*"
+    output: C:\Users\Andrew\AppData\Local\Temp\a1-01-main-menu.png
+
+  # Start sits ~43px above Continue (menu items are evenly spaced).
+  # Continue OCR'd at (595,247) 105x20, so Continue center ≈ (647, 257)
+  # and Start center ≈ (647, 214).
+  - name: Click Start on main menu
+    action: exec
+    args: inpctl.exe --window "TinnedSpaghetti*" --leftmouse "647,214"
+    wait: true
+
+  - name: Wait for world menu
+    action: wait-window
+    window: "TinnedSpaghetti*"
+    text: "Seed"
+    timeout: 15
+
+  - name: Screenshot world menu
+    action: screenshot
+    window: "TinnedSpaghetti*"
+    output: C:\Users\Andrew\AppData\Local\Temp\a1-02-world-menu.png
+
+  # world_menu.yml has focus: true on the Start button → Enter activates it.
+  - name: Press Enter to start world
+    action: exec
+    args: inpctl.exe --window "TinnedSpaghetti*" --keyboard "ENTER"
+    wait: true
+
+  - name: Wait for world to finish loading
+    action: sleep
+    args: "15"
+
+  - name: Screenshot in-game state
+    action: screenshot
+    window: "TinnedSpaghetti*"
+    output: C:\Users\Andrew\AppData\Local\Temp\a1-03-in-game.png
+
+  # Heartbeat fires immediately after _ready, then every 60s. Waiting 90s
+  # gives us two heartbeats batched and exported.
+  - name: Let heartbeats export
+    action: sleep
+    args: "90"
+
+  - name: Screenshot final state (before close)
+    action: screenshot
+    window: "TinnedSpaghetti*"
+    output: C:\Users\Andrew\AppData\Local\Temp\a1-04-before-close.png
+
+  # Open pause menu via the "pause" action (bound to ESC by default).
+  - name: Open pause menu
+    action: exec
+    args: inpctl.exe --window "TinnedSpaghetti*" --keyboard "ESC"
+    wait: true
+
+  - name: Wait for pause menu
+    action: sleep
+    args: "1"
+
+  - name: Screenshot pause menu
+    action: screenshot
+    window: "TinnedSpaghetti*"
+    output: C:\Users\Andrew\AppData\Local\Temp\a1-05-pause-menu.png
+
+  # Click Quit via OCR. "Quit" is short and recognized reliably.
+  - name: Click Quit in pause menu
+    action: click-text
+    window: "TinnedSpaghetti*"
+    text: "Quit"
+
+  - name: Let telemetry flush complete
+    action: sleep
+    args: "5"
