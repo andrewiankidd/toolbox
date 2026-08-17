@@ -18,18 +18,18 @@ Skip this skill when the task is purely code/file-based.
 
 ## Read the examples before authoring
 
-**IdleOps ships working playbook examples under `c:/git/idleops/src/playbk/inputs/`. Read one that resembles your task before writing your own.** They encode hard-won gotchas (WPF frameworks ignore PostMessage ALT+F4, WPF menu accelerators don't work remotely, OCR misreads small tab labels, etc.) that are tedious to rediscover.
+**Working playbook examples live in two places: the toolkit's own under `c:/git/idleops/src/playbk/inputs/`, and the real-world Crosspose ones under `c:/git/crosspose/assets/idleops/` (consumer repos keep their own playbooks). Read one that resembles your task before writing your own.** They encode hard-won gotchas (WPF frameworks ignore PostMessage ALT+F4, WPF menu accelerators don't work remotely, OCR misreads small tab labels, etc.) that are tedious to rediscover.
 
 | Example | What it demonstrates |
 |---------|----------------------|
 | [notepad-hello-world.idleops.yaml](c:/git/idleops/src/playbk/inputs/notepad-hello-world.idleops.yaml) | Minimal shape: launch → wait → type → close. Start here for simple flows. |
 | [mspaint-smiley.idleops.yaml](c:/git/idleops/src/playbk/inputs/mspaint-smiley.idleops.yaml) | Mouse drag + draw coordination. |
 | [smoke-test.idleops.yaml](c:/git/idleops/src/playbk/inputs/smoke-test.idleops.yaml) | Multi-tool sanity check. |
-| [crosspose-gui-screenshots.idleops.yaml](c:/git/idleops/src/playbk/inputs/crosspose-gui-screenshots.idleops.yaml) | The gold standard — sidebar navigation, OCR clicks, pixel fallback when OCR fails, double-click via paired `inpctl` calls, graceful close of WPF windows via X-button coordinates, theme toggle through a native menu. Read this when your task is non-trivial. |
-| [crosspose-doctor-screenshots.idleops.yaml](c:/git/idleops/src/playbk/inputs/crosspose-doctor-screenshots.idleops.yaml) | CLI-tool driving (not GUI) — `exec` with captured stdout, `%id_pid%` token use. |
-| [crosspose-dekompose-screenshots.idleops.yaml](c:/git/idleops/src/playbk/inputs/crosspose-dekompose-screenshots.idleops.yaml) | Another real-world GUI automation — cross-reference when patterns feel unfamiliar. |
+| [crosspose-gui-screenshots.idleops.yaml](c:/git/crosspose/assets/idleops/crosspose-gui-screenshots.idleops.yaml) | The gold standard — sidebar navigation, OCR clicks, pixel fallback when OCR fails, double-click via paired `inpctl` calls, graceful close of WPF windows via X-button coordinates, theme toggle through a native menu. Read this when your task is non-trivial. |
+| [crosspose-doctor-screenshots.idleops.yaml](c:/git/crosspose/assets/idleops/crosspose-doctor-screenshots.idleops.yaml) | CLI-tool driving (not GUI) — `exec` with captured stdout, `%id_pid%` token use. |
+| [crosspose-dekompose-screenshots.idleops.yaml](c:/git/crosspose/assets/idleops/crosspose-dekompose-screenshots.idleops.yaml) | Another real-world GUI automation — cross-reference when patterns feel unfamiliar. |
 
-At skill call time: **glob the inputs directory, pick the closest match to the task, read it top-to-bottom, then adapt.** Don't hand-write a playbook from memory when a working one already demonstrates the pattern.
+At skill call time: **glob both example directories, pick the closest match to the task, read it top-to-bottom, then adapt.** Don't hand-write a playbook from memory when a working one already demonstrates the pattern.
 
 ## playbk YAML is the preferred interface
 
